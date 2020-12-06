@@ -12,7 +12,7 @@ const port = process.env.PORT || 3000 ;
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        //Uses this account to send the email
+        //Uses this account to send the email, variables assigned using heroku config vars
         user : process.env.UserEmail,
         pass : process.env.UserPassword
     }
