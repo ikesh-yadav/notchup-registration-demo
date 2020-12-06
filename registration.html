@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            NotchUp-Registration
+        </title>
+        <link rel="stylesheet" href="styles.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                //To store the data regarding the class timings
+                //The dummy element exist to take the 0th spot as there is no course with course_id 0
+                let Global_slots = [{dummy:"filler"}]; 
+
+                //Obtaining a reference to the HTML Dropboxes
+                const $courseNameDropdown = $("#input-courseName");
+                const $classDateDropdown = $("#input-classDate");
+                const $classTimeDropdown = $("#input-classTime");
+
+                //Obtaining the data regarding the classes using a get call
+                $.get("https://script.google.com/macros/s/AKfycbzJ8Nn2ytbGO8QOkGU1kfU9q50RjDHje4Ysphyesyh-osS76wep/exec", (data) => {
+                    //Reading through the json data and forming an nested list of the form course_id.date.time called "Global_slots" to use in our form  
+                    $.each(data, (data_index, data_element) => {
+                        //Store the slots for the course
+                        let slots = data_element.slots;
+                        //Obtain the current time for checking for eligible classes,. i.e 4 hours from now and within 7 days
+                        const current_time = Date.now();
+                        //Finding the range of possible dates and time to offer to the user
+                        const max_time = current_time + 7*24*60*60*1000;
+                        const min_time = current_time + 4*60*60*1000;
+
+                        //Initializing an empty object to add slots to for the current course_id
+                        Global_slots[data_element.course_id] = {};
+
+                        //Reading through the slots and adding it to the list
+                        $.each(slots, (slot_index,slot_element)=>{
+                            //Checking for eligible slots
+                            if(slot_element.slot>=min_time && slot_element.slot<=max_time){
+                                //Converting date to the form YYYYMMDD
+                                let s = new Date(parseInt(slot_element.slot))
+                                let dayOfMonth = ""+s.getDate();
+                                let month = ""+s.getMonth();
+                                let year = ""+s.getFullYear();
+                                if (dayOfMonth.length<2) dayOfMonth="0"+dayOfMonth;
+                                if (month.length<2) month="0"+month;
+                                let date = year+month+dayOfMonth;
+
+                                //Converting time to the form HH:MM
+                                let time_slot = "";
+                                let hour = ""+s.getHours();
+                                let minutes = ""+s.getMinutes();
+                                if(minutes.length<2) minutes="0"+minutes;
+                                time_slot=hour+":"+minutes;
+                                //Adding an empty list for ever date if it doesnt already exist in the list
+                                if(!(date in Global_slots[data_element.course_id])){
+                                    Global_slots[data_element.course_id][date] = [];
+                                }
+                                //Adding the time slot to the respective date
+                                Global_slots[data_element.course_id][date].push(time_slot);
+                            }
+                        });
+                        //Appending the course names the couse selection dropbox
+                        $courseNameDropdown.append($("<option />").val(data_element.course_id).text(data_element.course_name));
+                    });
+                });
+                
+                //Adding an event listener to the course selection to detect change to update the class timings
+                $courseNameDropdown.change(()=>{
+                    //Obtain the value of the course selected
+                    courseNameDropdown_val = $courseNameDropdown.val();
+                    //Check if the course selected is default
+                    if (courseNameDropdown_val>0){
+                        //Enable the date selection dropdown
+                        $("#input-classDate").prop("disabled", false);
+                        //Obtain the date for the classes from "Global_slots" using the value from the course selection
+                        let date_slots = Object.keys(Global_slots[courseNameDropdown_val]);
+                        //Reset the date selection dropdown to update it with new value for the changed course
+                        $classDateDropdown.html("<option value='0'>Choose a date</option>");
+                        //Append all the date slots to the dropbox
+                        $.each(date_slots, (slot_index,date_slot_element)=>{
+                            $classDateDropdown.append($("<option />").val(date_slot_element).text(date_slot_element));
+                        });
+
+                    }else {
+                        //Disable date and time selction if no course is selected
+                        $classDateDropdown.val(0);
+                        $classDateDropdown.prop("disabled", true);
+                        $classTimeDropdown.val(0);
+                        $classTimeDropdown.prop("disabled", true);
+                    }
+                });
+
+                //Adding an event listener to detect change in the class date dropdown to update the times
+                $classDateDropdown.change(()=>{
+                    //Obtain the value of course and date selected 
+                    let courseNameDropdown_val = $courseNameDropdown.val();
+                    let classDateDropdown_val = $classDateDropdown.val();
+                    //Check if the course and date selected is default
+                    if (courseNameDropdown_val>0 && classDateDropdown_val>0){
+                        //Enable time selection dropdown
+                        $classTimeDropdown.prop("disabled", false);
+                        //obtain the time for the selected date 
+                        let time_slots = Global_slots[courseNameDropdown_val][classDateDropdown_val];
+                        //Reset the time selection dropdown to update it with new value for the changed date
+                        $classTimeDropdown.html("<option value='0'>Choose a time slot</option>");
+                        //Append all the time slots to the dropbox
+                        $.each(time_slots, (slot_index,time_slot_element)=>{
+                            $classTimeDropdown.append($("<option />").val(time_slot_element).text(time_slot_element));
+                        });
+
+                    }else {
+                        //Disable time selection if no date is selected
+                        $classTimeDropdown.val(0);
+                        $classTimeDropdown.prop("disabled", true);
+                    }
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <header>
+            <div class="div-logo-container">
+                <a href="./">
+                    <img width="100%" height="100%" src="./notchup-logo.png"></img>
+                </a>
+            </div>
+            <nav class="nav-header">
+                <ul class="ul-header-list">
+                    <li class="li-menu-element">
+                        <a href="./" target="_self" class="a-menu-link">
+                            <div class="div-menu-element-internal" style="text-align:center">
+                                <p class="p-menu-text">About Us</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="li-menu-element">
+                        <a href="./home" target="_self" class="a-menu-link">
+                            <div class="div-menu-element-internal" style="text-align:center">
+                                <p class="p-menu-text">Online Coding</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="li-menu-element">
+                        <a href="./communication-skills" target="_self" class="a-menu-link">
+                            <div class="div-menu-element-internal" style="text-align:center">
+                                <p class="p-menu-text">Spoken English</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="li-menu-element">
+                        <a href="./group-classes" target="_self" class="a-menu-link">
+                            <div class="div-menu-element-internal" style="text-align:center">
+                                <p class="p-menu-text">Group Classes</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="li-menu-element">
+                        <a href="./careers" target="_self" class="a-menu-link">
+                            <div class="div-menu-element-internal" style="text-align:center">
+                                <p class="p-menu-text">Join Us</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="li-menu-element">
+                        <a href="./contact" target="_self" class="a-menu-link">
+                            <div class="div-menu-element-internal" style="text-align:center">
+                                <p class="p-menu-text">Contact Us</p>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <form action = "/" method="POST">
+                <table class="table-center-screen">
+                    <tr>
+                        <td class="td-2-col" colspan="2" style="font-size: 28px;font-weight: bold;">Book a FREE trial class</td>
+                    </tr>
+                    <tr>
+                        <td><input class="input-text" id="input-parentName" name="parentName" placeholder="Enter Parent Name"></td>
+                    </tr>
+                    <tr>
+                        <td><input class="input-number" type="number" id="input-parentContactNumber" name="parentContactNumber" placeholder="Enter Parent Contact Number"></td>
+                    </tr>
+                    <tr>
+                        <td><input class="input-text" type="email" id="input-parentEmail" type="text" name="parentEmail" placeholder="Enter Parent Email"></td>
+                    </tr>
+                    <tr>
+                        <td><input class="input-text" id="input-childName" name="childName" placeholder="Enter Child Name"></td>
+                    </tr>
+                    <tr>
+                        <td><input class="input-number" type="number" id="input-childAge" name="childAge" placeholder="Enter Child's Age"></td>
+                    </tr>
+                    <tr>
+                        <td><select class="select" id="input-courseName" name="courseName" placeholder="Enter Course Name"><option value="0">Choose a course</option></select></td>
+                    </tr>
+                    <tr>
+                        <td><select class="select" id="input-classDate" name="classDate" disabled><option value="0">Choose a date for trial class</option></select></td>
+                    </tr>
+                    <tr>
+                        <td><select class="select" id="input-classTime" name="classTime" disabled><option value="0">Choose a time slot</option></select></td>
+                    </tr>
+                    <tr>
+                        <td class="td-2-col" colspan=2><input class="btn-submit" type="submit" value="Register"></td>
+                    </tr>
+                </table>
+            </form>
+        </main>
+    </body>
+</html>
