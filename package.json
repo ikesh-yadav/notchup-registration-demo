@@ -4,7 +4,9 @@
   "description": "notchup submission for internship training",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "main": "node server.js",
+    "heroku-postbuild": "npm install"
   },
   "author": "ikesh",
   "license": "ISC",
