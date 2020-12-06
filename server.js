@@ -13,8 +13,8 @@ let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         //Uses this account to send the email
-        user : "ikesh.temp@gmail.com",
-        pass : "K5AzB*WnH.G/:HQQ"
+        user : process.env.UserEmail,
+        pass : process.env.UserPassword
     }
 });
 
