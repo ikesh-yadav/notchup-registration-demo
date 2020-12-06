@@ -11,6 +11,6 @@ value:your email id that you desire to send the registration conformation emails
 key:"UserPassword"
 value:password for the above mentioned acoount
 
-Then the Web app can be used from the assidned url.
+Then the Web app can be used from the assigned url.
 
 
