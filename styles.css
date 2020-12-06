@@ -2,6 +2,19 @@ body {
     margin:0;
     background-color: white;
 }
+#loader {
+    color:green;
+    font-size: 42px;
+    position: fixed;
+    top: 15vh;
+    padding-top: 10%;
+    width:100vw;
+    height:100vh;
+    opacity: 60%;
+    margin: auto;
+    text-align: center;
+    z-index: 1000;
+}
 .table-center-screen {
     font-size: 20px;
     margin-left:auto;
@@ -83,4 +96,9 @@ main {
     width:40vw;
     padding:10px;
     margin-bottom: 10px;
+}
+.p-note {
+    color:red;
+    font-style: italic;
+    font-size: 18px;
 }
