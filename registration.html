@@ -96,14 +96,11 @@
 
                 //Adding an event listener to detect change in the class date dropdown to update the times
                 $classDateDropdown.change(()=>{
-                    console.log("entered section 1");
                     //Obtain the value of course and date selected 
                     let courseNameDropdown_val = $courseNameDropdown.val();
                     let classDateDropdown_val = $classDateDropdown.val();
-                    console.log(courseNameDropdown_val, classDateDropdown_val);
                     //Check if the course and date selected is default
                     if(courseNameDropdown_val!=0 && classDateDropdown_val!=0){
-                        console.log("entered section 2");
                         //Enable time selection dropdown
                         $classTimeDropdown.prop("disabled", false);
                         //obtain the time for the selected date 
