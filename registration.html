@@ -72,15 +72,18 @@
                     //Check if the course selected is default
                     if (courseNameDropdown_val>0){
                         //Enable the date selection dropdown
-                        $("#input-classDate").prop("disabled", false);
+                        $classDateDropdown.prop("disabled", false);
                         //Obtain the date for the classes from "Global_slots" using the value from the course selection
                         let date_slots = Object.keys(Global_slots[courseNameDropdown_val]);
                         //Reset the date selection dropdown to update it with new value for the changed course
-                        $classDateDropdown.html("<option value='0'>Choose a date</option>");
+                        $classDateDropdown.html("<option value='0'>Choose a date for trial class</option>");
                         //Append all the date slots to the dropbox
                         $.each(date_slots, (slot_index,date_slot_element)=>{
                             $classDateDropdown.append($("<option />").val(date_slot_element).text(date_slot_element));
                         });
+                        //Disable time selection untill a date is picked
+                        $classTimeDropdown.val(0);
+                        $classTimeDropdown.prop("disabled", true);
 
                     }else {
                         //Disable date and time selction if no course is selected
@@ -93,11 +96,14 @@
 
                 //Adding an event listener to detect change in the class date dropdown to update the times
                 $classDateDropdown.change(()=>{
+                    console.log("entered section 1");
                     //Obtain the value of course and date selected 
                     let courseNameDropdown_val = $courseNameDropdown.val();
                     let classDateDropdown_val = $classDateDropdown.val();
+                    console.log(courseNameDropdown_val, classDateDropdown_val);
                     //Check if the course and date selected is default
-                    if (courseNameDropdown_val>0 && classDateDropdown_val>0){
+                    if(courseNameDropdown_val!=0 && classDateDropdown_val!=0){
+                        console.log("entered section 2");
                         //Enable time selection dropdown
                         $classTimeDropdown.prop("disabled", false);
                         //obtain the time for the selected date 
