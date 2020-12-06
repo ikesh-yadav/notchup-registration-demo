@@ -6,7 +6,7 @@ const path = require("path");
 let app = express();
 
 //Find a free port to use
-const port = 3000;
+const port = process.env.PORT || 3000 ;
 
 //Used to send the conformation mail
 let transporter = nodemailer.createTransport({
